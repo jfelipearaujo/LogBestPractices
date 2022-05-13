@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Order;
 
 using Microsoft.Extensions.Logging;
 
@@ -6,17 +7,20 @@ using System;
 
 namespace LogBestPractices
 {
+    [Orderer(SummaryOrderPolicy.FastestToSlowest)]
+    [RankColumn]
     [MemoryDiagnoser]
     public class LogBenchmark
     {
         private static readonly DateTime timestamp = DateTime.Now;
         private static readonly Guid processId = Guid.NewGuid();
+        private static readonly User user = new(Guid.NewGuid(), "John Doe");
 
         private static readonly string LogMessageTemplate = "{Timestamp} {ProcessId} This is a log message with a decimal parameter '{Value}'";
 
         private readonly ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
         {
-            builder.AddFakeLogger().SetMinimumLevel(LogLevel.Warning);
+            builder.AddFakeLogger().SetMinimumLevel(LogLevel.Debug);
         });
 
         private readonly ILogger<LogBenchmark> logger;
@@ -28,98 +32,142 @@ namespace LogBestPractices
             loggerAdapter = new LoggerAdapter<LogBenchmark>(logger);
         }
 
-        [Benchmark]
+        [Benchmark(Description = "SP")]
         public void SimpleProcess()
         {
-            logger.LogInformation(LogMessageTemplate);
+            logger.LogDebug(LogMessageTemplate);
         }
 
-        [Benchmark]
+        [Benchmark(Description = "SPwPar")]
         public void SimpleProcessWithParams()
         {
-            logger.LogInformation(LogMessageTemplate, timestamp, processId, 1.12334234m);
+            logger.LogDebug(LogMessageTemplate, timestamp, processId, 1.12334234m);
         }
 
-        [Benchmark]
+        [Benchmark(Description = "SPwStrInt")]
         public void SimpleProcessWithStringInterpolation()
         {
-            logger.LogInformation($"{timestamp} {processId} This is a log message with a decimal parameter '{1.12334234m}'");
+            logger.LogDebug($"{timestamp} {processId} This is a log message with a decimal parameter '{1.12334234m}'");
         }
 
-        [Benchmark]
+        [Benchmark(Description = "SPwIf")]
         public void SimpleProcessWithIf()
         {
-            if (logger.IsEnabled(LogLevel.Information))
+            if (logger.IsEnabled(LogLevel.Debug))
             {
-                logger.LogInformation(LogMessageTemplate);
+                logger.LogDebug(LogMessageTemplate);
             }
         }
 
-        [Benchmark]
+        [Benchmark(Description = "SPwParIf")]
         public void SimpleProcessWithParamsWithIf()
         {
-            if (logger.IsEnabled(LogLevel.Information))
+            if (logger.IsEnabled(LogLevel.Debug))
             {
-                logger.LogInformation(LogMessageTemplate, timestamp, processId, 1.12334234m);
+                logger.LogDebug(LogMessageTemplate, timestamp, processId, 1.12334234m);
             }
         }
 
-        [Benchmark]
+        [Benchmark(Description = "SPwStrIntIf")]
         public void SimpleProcessWithStringInterpolationWithIf()
         {
-            if (logger.IsEnabled(LogLevel.Information))
+            if (logger.IsEnabled(LogLevel.Debug))
             {
-                logger.LogInformation($"{timestamp} {processId} This is a log message with a decimal parameter '{1.12334234m}'");
+                logger.LogDebug($"{timestamp} {processId} This is a log message with a decimal parameter '{1.12334234m}'");
             }
         }
 
-        [Benchmark]
+        [Benchmark(Description = "HPwPar")]
         public void HeavyProccessWithParams()
         {
             for (int i = 0; i < 10_000_000; i++)
             {
-                logger.LogInformation(LogMessageTemplate, timestamp, processId, 1.12334234m);
+                logger.LogDebug(LogMessageTemplate, timestamp, processId, 1.12334234m);
             }
         }
 
-        [Benchmark]
+        [Benchmark(Description = "HPwAdpPar")]
+        public void HeavyProcessAdapterWithParams()
+        {
+            for (int i = 0; i < 10_000_000; i++)
+            {
+                loggerAdapter.LogDebug(LogMessageTemplate, timestamp, processId, 1.12334234m);
+            }
+        }
+
+        [Benchmark(Description = "HPwAdpParAnoObj")]
+        public void HeavyProcessAdapterWithParamsAndAnonymousObjData()
+        {
+            for (int i = 0; i < 10_000_000; i++)
+            {
+                loggerAdapter.LogDebugWithData(LogMessageTemplate, timestamp, processId, 1.12334234m, new
+                {
+                    id = 1,
+                    name = "test"
+                });
+            }
+        }
+
+        [Benchmark(Description = "HPwAdpParKnoObjWithIf")]
+        public void HeavyProcessAdapterWithParamsAndKnownObjDataWithIf()
+        {
+            for (int i = 0; i < 10_000_000; i++)
+            {
+                loggerAdapter.LogDebugWithData(LogMessageTemplate, timestamp, processId, 1.12334234m, user);
+            }
+        }
+
+        [Benchmark(Description = "HPwAdpParAnoObjWithIf")]
+        public void HeavyProcessAdapterWithParamsAndAnonymousObjDataWithIf()
+        {
+            for (int i = 0; i < 10_000_000; i++)
+            {
+                loggerAdapter.LogDebugWithData(LogMessageTemplate, timestamp, processId, 1.12334234m, new
+                {
+                    id = 1,
+                    name = "test"
+                });
+            }
+        }
+
+        [Benchmark(Description = "HPwAdpParKnoObj")]
+        public void HeavyProcessAdapterWithParamsAndKnownObjData()
+        {
+            for (int i = 0; i < 10_000_000; i++)
+            {
+                loggerAdapter.LogDebugWithData(LogMessageTemplate, timestamp, processId, 1.12334234m, user);
+            }
+        }
+
+        [Benchmark(Description = "HPwParIf")]
         public void HeavyProccessWithParamsWithIf()
         {
             for (int i = 0; i < 10_000_000; i++)
             {
-                if (logger.IsEnabled(LogLevel.Information))
+                if (logger.IsEnabled(LogLevel.Debug))
                 {
-                    logger.LogInformation(LogMessageTemplate, timestamp, processId, 1.12334234m);
+                    logger.LogDebug(LogMessageTemplate, timestamp, processId, 1.12334234m);
                 }
             }
         }
 
-        [Benchmark]
-        public void HeavyProccessAdapterWithParams()
+        [Benchmark(Description = "HPwStrInt")]
+        public void HeavyProcessWithStringInterpolation()
         {
             for (int i = 0; i < 10_000_000; i++)
             {
-                loggerAdapter.LogInformation(LogMessageTemplate, timestamp, processId, 1.12334234m);
+                logger.LogDebug($"{timestamp} {processId} This is a log message with a decimal parameter '{1.12334234m}'");
             }
         }
 
-        [Benchmark]
-        public void HeavyProccessWithStringInterpolation()
+        [Benchmark(Description = "HPwStrIntIf")]
+        public void HeavyProcessWithStringInterpolationWithIf()
         {
             for (int i = 0; i < 10_000_000; i++)
             {
-                logger.LogInformation($"{timestamp} {processId} This is a log message with a decimal parameter '{1.12334234m}'");
-            }
-        }
-
-        [Benchmark]
-        public void HeavyProccessWithStringInterpolationWithIf()
-        {
-            for (int i = 0; i < 10_000_000; i++)
-            {
-                if (logger.IsEnabled(LogLevel.Information))
+                if (logger.IsEnabled(LogLevel.Debug))
                 {
-                    logger.LogInformation($"{timestamp} {processId} This is a log message with a decimal parameter '{1.12334234m}'");
+                    logger.LogDebug($"{timestamp} {processId} This is a log message with a decimal parameter '{1.12334234m}'");
                 }
             }
         }

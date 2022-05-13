@@ -1,52 +1,64 @@
 # LogBestPractices
 
 ### Legend
-- SP: Simple Process
-- SPwPar: Simple Process With Params
-- SPwStrInt: Simple Process With String Interpolation
-- SPwIf: Simples Process With If
-- SPwPaRwIf: Simple Process With Params and With If
-- SPwStrIntWif: Simple Process With String Interpolation and With If
-- HPwPar: Heavy Process With Params
-- HPwParWif: Heavy Proccess With Params and WithIf
-- HPwAdpPar: Heavy Proccess with Adapter and With Params
-- HPwStrInt: Heavy Proccess With String Interpolation
-- HPwStrIntWif: Heavy Proccess With String Interpolation and With If
+- SP: Simple process
+- SPwPar: Simple process with parameters
+- SPwStrInt: Simple process with string interpolation
+- SPwIf: Simple process with If (for log level)
+- SPwParIf: Simple process with parameters and If (for log level)
+- SPwStrIntIf: Simple process with string interpolation and If (for log level)
+- HPwPar: Heavy process with parameters
+- HPwAdpPar: Heavy process with log Adapter and parameters
+- HPwAdpParAnoObj: Heavy process with log Adapter, parameters and anonymous object
+- HPwAdpParKnoObj: Heavy process with log Adapter, parameters and known object
+- HPwAdpParKnoObjWithIf: Heavy process with log Adapter, parameters and anonymous object and If (for log level)
+- HPwAdpParAnoObjWithIf: Heavy process with log Adapter, parameters and known object and If (for log level)
+- HPwParIf: Heavy process with parameters and If (for log level)
+- HPwStrInt: Heavy process with string interpolation
+- HPwStrIntIf: Heavy process with string interpolation and If (for log level)
+
+### Test details
+
+All logs are calling Debug method and the minimum level is defined for Information.
 
 ## Microsoft logger and Log Adapter results
 
-*Logs level: Information* and *Minimum Level: Warning*
-
-|       Method |                 Mean |              Error |             StdDev |       Gen 0 |       Allocated |
-|------------- |---------------------:|-------------------:|-------------------:|------------:|----------------:|
-|           SP |            36.024 ns |          0.1062 ns |          0.0829 ns |           - |               - |
-|       SPwPar |           122.591 ns |          0.7873 ns |          0.6574 ns |      0.0215 |           136 B |
-|    SPwStrInt |           725.163 ns |          6.1399 ns |          5.4429 ns |      0.0877 |           552 B |
-|        SPwIf |             6.639 ns |          0.0196 ns |          0.0153 ns |           - |               - |
-|    SPwPaRwIf |             6.668 ns |          0.1352 ns |          0.1198 ns |           - |               - |
-| SPwStrIntWif |            12.575 ns |          0.0423 ns |          0.0330 ns |           - |               - |
-|       HPwPar | 1,214,381,552.941 ns | 20,542,754.6812 ns | 21,095,896.6046 ns | 216000.0000 | 1,360,001,848 B or 1,36 GB |
-|    HPwParWif |    64,186,693.269 ns |    191,468.1840 ns |    159,884.6052 ns |           - |         1,201 B |
-|    HPwAdpPar |   172,190,791.111 ns |    520,769.4771 ns |    487,128.0920 ns |           - |               - |
-|    HPwStrInt | 6,965,133,757.143 ns | 38,524,944.2117 ns | 34,151,359.5860 ns | 879000.0000 | 5,520,001,440 B or 5,52 GB|
-| HPwStrIntWif |    64,927,518.750 ns |     33,082.4815 ns |     29,326.7582 ns |           - |           614 B |
+|                Method |                Mean |             Error |            StdDev | Rank |       Gen 0 |       Allocated |
+|---------------------- |--------------------:|------------------:|------------------:|-----:|------------:|----------------:|
+|                    SP |            44.12 ns |          0.192 ns |          0.150 ns |    1 |           - |               - |
+|                 SPwIf |            55.43 ns |          0.584 ns |          0.547 ns |    2 |           - |               - |
+|                SPwPar |           133.12 ns |          1.021 ns |          0.955 ns |    3 |      0.0215 |           136 B |
+|              SPwParIf |           141.46 ns |          0.335 ns |          0.297 ns |    4 |      0.0215 |           136 B |
+|           SPwStrIntIf |           732.71 ns |          3.086 ns |          2.736 ns |    5 |      0.0877 |           552 B |
+|             SPwStrInt |           733.35 ns |          5.650 ns |          5.285 ns |    5 |      0.0877 |           552 B |
+|                HPwPar | 1,331,299,300.00 ns |  4,241,083.793 ns |  3,759,610.315 ns |    6 | 216000.0000 | 1,360,000,000 B |
+|              HPwParIf | 1,375,677,961.54 ns |  5,966,537.528 ns |  4,982,329.061 ns |    7 | 216000.0000 | 1,360,000,000 B |
+|             HPwAdpPar | 1,549,881,207.14 ns |  5,678,376.440 ns |  5,033,732.810 ns |    8 | 216000.0000 | 1,360,000,000 B |
+|       HPwAdpParAnoObj | 1,614,623,650.00 ns |  6,068,595.478 ns |  4,737,960.174 ns |    9 | 280000.0000 | 1,760,001,336 B |
+| HPwAdpParKnoObjWithIf | 1,639,876,223.53 ns | 31,922,942.707 ns | 32,782,511.845 ns |   10 | 229000.0000 | 1,440,000,000 B |
+|       HPwAdpParKnoObj | 1,644,097,686.67 ns | 11,357,920.356 ns | 10,624,205.748 ns |   10 | 229000.0000 | 1,440,000,000 B |
+| HPwAdpParAnoObjWithIf | 1,708,052,660.00 ns | 15,772,143.506 ns | 14,753,272.821 ns |   11 | 280000.0000 | 1,760,001,848 B |
+|             HPwStrInt | 7,219,351,571.43 ns | 30,437,985.748 ns | 26,982,481.548 ns |   12 | 879000.0000 | 5,520,000,000 B |
+|           HPwStrIntIf | 7,307,434,406.67 ns | 28,958,760.275 ns | 27,088,042.328 ns |   12 | 879000.0000 | 5,520,000,000 B |
 
 ## Serilog results
 
-*Logs level: Information* and *Minimum Level: Warning*
-
-|       Method |                 Mean |              Error |             StdDev |       Gen 0 |       Allocated |
-|------------- |---------------------:|-------------------:|-------------------:|------------:|----------------:|
-|           SP |             3.577 ns |          0.0116 ns |          0.0097 ns |           - |               - |
-|       SPwPar |             9.176 ns |          0.0741 ns |          0.0657 ns |           - |               - |
-|    SPwStrInt |           656.386 ns |          9.3832 ns |          8.7770 ns |      0.0877 |           552 B |
-|        SPwIf |             1.842 ns |          0.0155 ns |          0.0137 ns |           - |               - |
-|    SPwPaRwIf |             1.879 ns |          0.0036 ns |          0.0032 ns |           - |               - |
-| SPwStrIntWif |             1.862 ns |          0.0044 ns |          0.0041 ns |           - |               - |
-|       HPwPar |    91,920,852.222 ns |    222,152.9755 ns |    207,802.0311 ns |           - |           892 B |
-|    HPwParWif |   135,070,303.571 ns |    211,422.2085 ns |    187,420.2810 ns |           - |           314 B |
-|    HPwAdpPar |    20,170,683.750 ns |     46,032.5353 ns |     43,058.8621 ns |           - |            42 B |
-|    HPwStrInt | 6,597,733,246.667 ns | 48,808,460.1546 ns | 45,655,463.9115 ns | 879000.0000 | 5,520,000,000 B or 5,52 GB |
-| HPwStrIntWif |    20,126,878.542 ns |     43,904.6022 ns |     41,068.3921 ns |           - |            41 B |
+|                Method |                 Mean |              Error |             StdDev | Rank |       Gen 0 |       Allocated |
+|---------------------- |---------------------:|-------------------:|-------------------:|-----:|------------:|----------------:|
+|                 SPwIf |             1.854 ns |          0.0240 ns |          0.0224 ns |    1 |           - |               - |
+|           SPwStrIntIf |             1.915 ns |          0.0222 ns |          0.0197 ns |    2 |           - |               - |
+|              SPwParIf |             1.923 ns |          0.0316 ns |          0.0295 ns |    2 |           - |               - |
+|                    SP |             3.532 ns |          0.0405 ns |          0.0378 ns |    3 |           - |               - |
+|                SPwPar |             9.354 ns |          0.0832 ns |          0.0778 ns |    4 |           - |               - |
+|             SPwStrInt |           653.558 ns |          7.9920 ns |          7.0847 ns |    5 |      0.0877 |           552 B |
+|              HPwParIf |    20,191,036.458 ns |     32,939.6862 ns |     25,717.1403 ns |    6 |           - |            41 B |
+|           HPwStrIntIf |    20,552,954.018 ns |    108,768.4595 ns |     96,420.4063 ns |    7 |           - |           150 B |
+|                HPwPar |    92,351,927.381 ns |    374,867.6137 ns |    332,310.3754 ns |    8 |           - |           225 B |
+|             HPwAdpPar |   141,604,636.667 ns |  1,197,639.2664 ns |  1,120,272.5129 ns |    9 |           - |         2,330 B |
+| HPwAdpParKnoObjWithIf |   142,645,639.286 ns |    526,344.8661 ns |    466,591.0142 ns |    9 |           - |         2,330 B |
+| HPwAdpParAnoObjWithIf |   174,129,451.111 ns |  1,138,075.2841 ns |  1,064,556.3269 ns |   10 |  51000.0000 |   320,000,000 B |
+|       HPwAdpParKnoObj | 1,118,782,660.000 ns |  2,912,871.8093 ns |  2,724,702.0977 ns |   11 | 395000.0000 | 2,480,000,000 B |
+|       HPwAdpParAnoObj | 1,154,114,133.333 ns | 11,418,594.6462 ns | 10,680,960.5166 ns |   12 | 446000.0000 | 2,800,000,000 B |
+|             HPwStrInt | 6,569,995,369.231 ns | 30,034,661.0617 ns | 25,080,302.2632 ns |   13 | 879000.0000 | 5,520,000,000 B |
 
 Methods WithIf statements are irrelevant for this benchmark because Serilog already do the "ifs" internally

@@ -1,4 +1,6 @@
 ﻿using Serilog;
+using Serilog.Context;
+using Serilog.Events;
 
 namespace LogBestPractices
 {
@@ -11,33 +13,54 @@ namespace LogBestPractices
             this.logger = logger;
         }
 
-        public void Information(string message)
+        public void Debug(string message)
         {
-            logger.Information(message);
+            logger.Debug(message);
         }
 
-        public void Information<T0>(string messageTemplate, T0 t0)
+        public void Debug<T0>(string messageTemplate, T0 t0)
         {
-            logger.Information(messageTemplate, t0);
+            logger.Debug(messageTemplate, t0);
         }
 
-        public void Information<T0, T1>(string messageTemplate, T0 t0, T1 t1)
+        public void Debug<T0, T1>(string messageTemplate, T0 t0, T1 t1)
         {
-            logger.Information(messageTemplate, t0, t1);
+            logger.Debug(messageTemplate, t0, t1);
         }
 
-        public void Information<T0, T1, T2>(string messageTemplate, T0 t0, T1 t1, T2 t2)
+        public void Debug<T0, T1, T2>(string messageTemplate, T0 t0, T1 t1, T2 t2)
         {
-            logger.Information(messageTemplate, t0, t1, t2);
+            logger.Debug(messageTemplate, t0, t1, t2);
+        }
+
+        public void DebugWithData<T0, T1, T2, TData>(string messageTemplate, T0 t0, T1 t1, T2 t2, TData data)
+        {
+            using (var context = LogContext.PushProperty("data", data, true))
+            {
+                logger.Debug(messageTemplate, t0, t1, t2);
+            }
+        }
+
+        public void DebugWithIfWithData<T0, T1, T2, TData>(string messageTemplate, T0 t0, T1 t1, T2 t2, TData data)
+        {
+            if (logger.IsEnabled(LogEventLevel.Debug))
+            {
+                using (var context = LogContext.PushProperty("data", data, true))
+                {
+                    logger.Debug(messageTemplate, t0, t1, t2);
+                }
+            }
         }
     }
 
     public interface ILoggerAdapter
     {
-        void Information(string message);
-        void Information<T0>(string messageTemplate, T0 t0);
-        void Information<T0, T1>(string messageTemplate, T0 t0, T1 t1);
-        void Information<T0, T1, T2>(string messageTemplate, T0 t0, T1 t1, T2 t2);
+        void Debug(string message);
+        void Debug<T0>(string messageTemplate, T0 t0);
+        void Debug<T0, T1>(string messageTemplate, T0 t0, T1 t1);
+        void Debug<T0, T1, T2>(string messageTemplate, T0 t0, T1 t1, T2 t2);
+        void DebugWithData<T0, T1, T2, TData>(string messageTemplate, T0 t0, T1 t1, T2 t2, TData data);
+        void DebugWithIfWithData<T0, T1, T2, TData>(string messageTemplate, T0 t0, T1 t1, T2 t2, TData data);
     }
 }
 
